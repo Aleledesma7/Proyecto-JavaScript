@@ -1,71 +1,96 @@
 // Punto 1: Variables, constantes y arrays //
-const peliculas = ["Tenet", "Interestelar", "Inception", "Batman"];
+/*const peliculas = ["Tenet", "Interestelar", "Inception", "Batman"];
 const precioEntrada = 800;
-let entradasDisponibles = 20;
+let entradasDisponibles = 20;*/
 
-// Funcion para mostrar peliculas //
-function mostrarPeliculas() {
-    console.log("Películas disponibles:");
-    peliculas.forEach((pelicula, index) => console.log(`${index + 1}. ${pelicula}`));
-}
+const peliculas = [
+  {
+    titulo: "Tenet",
+    duracion: 150,
+    genero: "Ciencia Ficción",
+    entradas: 20,
+    precio: 800,
+  },
+  {
+    titulo: "Interestelar",
+    duracion: 220,
+    genero: "Ciencia Ficción",
+    entradas: 40,
+    precio: 950,
+  },
+  {
+    titulo: "Inception",
+    duracion: 200,
+    genero: "Ciencia Ficción",
+    entradas: 100,
+    precio: 800,
+  },
+  {
+    titulo: "Batman",
+    duracion: 500,
+    genero: "Ciencia Ficción",
+    entradas: 40,
+    precio: 1000,
+  },
+];
 
-// Funcion para comprar //
-function comprarEntradas() {
-    mostrarPeliculas();
-    const eleccion = parseInt(prompt("Ingresa el numero de la pelicula que queres ver:"));
-    
-    if (eleccion < 1 || eleccion > peliculas.length) {
-        alert("Elección invalida, intente de nuevo.");
-        return;
-    }
+const lista_peliculas = document.getElementById("lista_peliculas");
+const formulario = document.getElementById("formulario");
+const comprar_btn = document.getElementById("comprar_btn");
+const resultado = document.getElementById("resultado");
 
-    const peliculaSeleccionada = peliculas[eleccion - 1];
-    const cantidad = parseInt(prompt(`¿Cuántas entradas quiere para"${peliculaSeleccionada}"?`));
+window.onload = () => {
+  comprar_btn.style.display = "none";
+  resultado.style.display = "none";
 
-    if (isNaN(cantidad) || cantidad <= 0) {
-        alert("El minimo es de una entrada!");
-        return;
-    }
-
-    if (cantidad > entradasDisponibles) {
-        alert("No hay suficientes entradas disponibles.");
-        return;
-    }
-
-    const total = cantidad * precioEntrada;
-
-    // Confirm y alert //
-    const confirmarCompra = confirm(`El costo total es $${total}. ¿Confirmar la compra?`);
-
-    if (confirmarCompra) {
-        entradasDisponibles -= cantidad;
-        alert(`Compra realizada!, entradas restantes: ${entradasDisponibles}`);
-        console.log("Compra confirmada: ${cantidad} entradas para ${peliculaSeleccionada}.");
-    } else {
-        alert("Compra cancelada.");
-    }
-}
-
-// Promesa //
-function procesarCompra() {
-    return new Promise((resolve) => {
-        alert("Procesando su compra, por favor espere...");
-        setTimeout(() => {
-            resolve();
-        }, 2000); 
+  function loadPeliculas() {
+    lista_peliculas.innerHTML = "";
+    peliculas.forEach((pelicula) => {
+      const item = document.createElement("li");
+      item.textContent = `${pelicula.titulo} - ${pelicula.genero} - ${pelicula.duracion} minutos - $${pelicula.precio} - disponibles: ${pelicula.entradas}`;
+      lista_peliculas.appendChild(item);
     });
-}
+  }
 
-// Inciar simulador //
-function iniciarSimulador() {
-    let continuar = true;
+  loadPeliculas();
 
-    while (continuar) {
-        comprarEntradas();
-        continuar = confirm("Quiere hacer otra compra?");
+  formulario.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const data = new FormData(e.target);
+    const nombre = data.get("nombre");
+    const entradas = data.get("entradas");
+
+    if (!nombre) return alert("Debe ingresar el nombre de la pelicula");
+    if (!entradas) return alert("Debe ingresar cuantas entradas desea");
+
+    const pelicula = peliculas.find((pelicula) => pelicula.titulo === nombre);
+    const peliculaIndex = peliculas.findIndex(
+      (pelicula) => pelicula.titulo === nombre
+    );
+    const submitter = e.submitter.name;
+    let total = 0;
+
+    if (submitter === "consultar") {
+      if (!pelicula) return alert("No encontramos esta pelicula :(");
+      if (pelicula.entradas < entradas) return alert("No hay suficientes entradas");
+
+      total = entradas * pelicula.precio;
+      resultado.textContent = `Total a pagar: $${total}`;
+      resultado.style.display = "inherit";
+      comprar_btn.style.display = "inherit";
     }
 
-    alert("Gracias por su visita!");
-}
-
-iniciarSimulador();
+    if (submitter === "comprar") {
+      if (pelicula.entradas < entradas) return alert("No hay suficientes entradas");
+      pelicula.entradas -= entradas;
+      peliculas[peliculaIndex] = pelicula; // guardamos las nuevas entradas
+      loadPeliculas();
+      resultado.textContent = `Total a pagar: `;
+      resultado.style.display = "none";
+      comprar_btn.style.display = "none";
+      alert("Gracias por su compra! :D")
+      e.currentTarget.reset();
+    }
+  });
+};
