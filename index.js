@@ -1,8 +1,3 @@
-// Punto 1: Variables, constantes y arrays //
-/*const peliculas = ["Tenet", "Interestelar", "Inception", "Batman"];
-const precioEntrada = 800;
-let entradasDisponibles = 20;*/
-
 const peliculas = [
   {
     titulo: "Tenet",
@@ -47,6 +42,7 @@ window.onload = () => {
     lista_peliculas.innerHTML = "";
     peliculas.forEach((pelicula) => {
       const item = document.createElement("li");
+      item.className = "list-group-item";
       item.textContent = `${pelicula.titulo} - ${pelicula.genero} - ${pelicula.duracion} minutos - $${pelicula.precio} - disponibles: ${pelicula.entradas}`;
       lista_peliculas.appendChild(item);
     });
@@ -73,23 +69,25 @@ window.onload = () => {
 
     if (submitter === "consultar") {
       if (!pelicula) return alert("No encontramos esta pelicula :(");
-      if (pelicula.entradas < entradas) return alert("No hay suficientes entradas");
+      if (pelicula.entradas < entradas)
+        return alert("No hay suficientes entradas");
 
       total = entradas * pelicula.precio;
       resultado.textContent = `Total a pagar: $${total}`;
-      resultado.style.display = "inherit";
-      comprar_btn.style.display = "inherit";
+      resultado.style.display = "block";
+      comprar_btn.style.display = "block";
     }
 
     if (submitter === "comprar") {
-      if (pelicula.entradas < entradas) return alert("No hay suficientes entradas");
+      if (pelicula.entradas < entradas)
+        return alert("No hay suficientes entradas");
       pelicula.entradas -= entradas;
       peliculas[peliculaIndex] = pelicula; // guardamos las nuevas entradas
       loadPeliculas();
       resultado.textContent = `Total a pagar: `;
       resultado.style.display = "none";
       comprar_btn.style.display = "none";
-      alert("Gracias por su compra! :D")
+      alert("Gracias por su compra! :D");
       e.currentTarget.reset();
     }
   });
